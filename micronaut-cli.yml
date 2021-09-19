@@ -1,0 +1,6 @@
+applicationType: default
+defaultPackage: com.electric.system
+testFramework: spock
+sourceLanguage: java
+buildTool: maven
+features: [annotation-api, app-name, http-client, java, java-application, log4j2, maven, netty-server, readme, shade, spock, yaml]
