@@ -1,7 +1,7 @@
 package com.app.electric.controllers
 
 import com.app.electric.domain.UserDto
-import com.app.electric.repositories.IUserRepository
+import com.app.electric.services.UserService
 import io.micronaut.context.annotation.Replaces
 import io.micronaut.http.HttpStatus
 import io.micronaut.test.annotation.MockBean
@@ -12,19 +12,19 @@ import spock.lang.Specification
 @MicronautTest
 class UserRegisterControllerSpec extends Specification {
     @Inject
-    IUserRepository userRepository
+    UserService userService
 
     @MockBean
-    @Replaces(IUserRepository)
-    IUserRepository mockRepo() {
-        return Mock(IUserRepository);
+    @Replaces(UserService)
+    UserService mockService() {
+        return Mock(UserService);
     }
 
     UserRegisterController userRegisterController
     UserDto alfie
 
     def setup(){
-        userRegisterController = new UserRegisterController(userRepository)
+        userRegisterController = new UserRegisterController(userService)
         alfie = new UserDto("Alfie", "MyCat", "alfie@cat.com")
     }
 
@@ -33,9 +33,10 @@ class UserRegisterControllerSpec extends Specification {
             def expected = [alfie]
             def lastName = "MyCat"
         when:
+            userService.findByLastName(lastName) >> expected
             def response = userRegisterController.getUser(lastName)
         then:
-            1 * userRepository.findByLastNameIgnoreCase(lastName) >> expected
+//            1 * userService.findByLastName(lastName) >> expected
             response.status == HttpStatus.OK
             response.body() == expected
     }
@@ -45,7 +46,7 @@ class UserRegisterControllerSpec extends Specification {
             def response = userRegisterController.getUser("Alfie")
         then:
             response.status == HttpStatus.NOT_FOUND
-            1 * userRepository.findByLastNameIgnoreCase(_) >> []
+            1 * userService.findByLastName(_) >> []
             response.body() == null
     }
 
@@ -57,7 +58,7 @@ class UserRegisterControllerSpec extends Specification {
         when:
         def response = userRegisterController.addUser(alfie)
         then:
-            1 * userRepository.save(alfie) >> expected
+            1 * userService.save(alfie) >> expected
             response.status == HttpStatus.CREATED
             response.body() == expected
     }
@@ -67,7 +68,7 @@ class UserRegisterControllerSpec extends Specification {
         def response = userRegisterController.addUser(alfie)
         then:
         response.status == HttpStatus.SERVICE_UNAVAILABLE
-        1 * userRepository.save(_) >> null
+        1 * userService.save(_) >> null
         response.body() == null
     }
 

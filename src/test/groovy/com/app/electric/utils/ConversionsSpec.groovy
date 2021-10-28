@@ -2,15 +2,16 @@ package com.app.electric.utils
 
 import com.app.electric.domain.User
 import com.app.electric.domain.UserDto
+import io.micronaut.test.extensions.spock.annotation.MicronautTest
+import io.micronaut.validation.Validated
 import spock.lang.Specification
 
+@Validated
+@MicronautTest
 class ConversionsSpec extends Specification {
     Conversions conversions
-    UserDto userDto
-    User user
-
     def setup () {
-        conversions = new Conversions()
+        conversions = new ConversionsImpl()
     }
 
     def "converts User to UserDto"() {
@@ -30,6 +31,17 @@ class ConversionsSpec extends Specification {
             def converted = conversions.toUserDto(null)
         then:
             converted == null
+    }
+
+    def "converts UserDto to User"() {
+        given:
+            UserDto userDto = new UserDto("Monty", "ACat", "monty@cat.com")
+        when:
+            def converted = conversions.toUser(userDto)
+        then:
+            converted.lastName == userDto.lastName
+            converted.firstName == userDto.firstName
+            converted.email == userDto.email
     }
 
 }

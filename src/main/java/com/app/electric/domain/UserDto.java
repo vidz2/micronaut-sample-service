@@ -10,6 +10,7 @@ import java.util.UUID;
 @Introspected
 public class UserDto {
     private UUID id;
+
     @NotNull
     @NotBlank
     private String firstName;
@@ -31,10 +32,6 @@ public class UserDto {
 
     public UUID getId() {
         return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
     }
 
     public String getFirstName() {

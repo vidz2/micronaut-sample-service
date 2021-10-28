@@ -1,8 +1,7 @@
 package com.app.electric.controllers;
 
 import com.app.electric.domain.UserDto;
-import com.app.electric.repositories.IUserRepository;
-import com.app.electric.repositories.UserRepository;
+import com.app.electric.services.UserService;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.Body;
@@ -11,22 +10,21 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
 import jakarta.inject.Inject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller("/user")
 public class UserRegisterController {
     @Inject
-    IUserRepository userRepository;
+    UserService userService;
 
-    public UserRegisterController(IUserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserRegisterController(UserService userService) {
+        this.userService = userService;
     }
 
     @Get("/{lastName}")
     HttpResponse<List<UserDto>> getUser(String lastName){
-        List<UserDto> users = userRepository
-                .findByLastNameIgnoreCase(lastName);
+        List<UserDto> users = userService
+                .findByLastName(lastName);
         if (users.size() == 0)
             return HttpResponse.notFound();
         return HttpResponse.ok(users);
@@ -34,7 +32,7 @@ public class UserRegisterController {
 
     @Post
     HttpResponse<UserDto> addUser(@Body UserDto user ) {
-        UserDto createdUser = userRepository.save(user);
+        UserDto createdUser = userService.save(user);
         if (createdUser == null)
             return HttpResponse.status(HttpStatus.SERVICE_UNAVAILABLE);
         return HttpResponse.created(createdUser);
